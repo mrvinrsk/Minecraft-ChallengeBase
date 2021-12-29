@@ -1,0 +1,15 @@
+name: ChallengeBase
+main: de.mrvinrsk.challengebase.main.ChallengeBase
+version: 0.1
+author: TotalRational
+
+api-version: 1.17
+depend: [SpigotAPI]
+
+commands:
+  challenge:
+    aliases:
+      - c
+    description: De-/Aktiviere Challenge-Plugins
+  event:
+    description: Liste alle Events die registriert wurden.
