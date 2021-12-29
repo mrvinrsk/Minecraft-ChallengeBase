@@ -6,7 +6,6 @@ import de.mrvinrsk.challengebase.main.ChallengeBase;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.*;
@@ -31,11 +30,23 @@ public class ChallengeEventManager {
     public List<ChallengeEvent> getEvents() {
         List<ChallengeEvent> es = new ArrayList<>();
 
-        if(!events.isEmpty()) {
+        if (!events.isEmpty()) {
             for (Map.Entry<Plugin, List<ChallengeEvent>> entry : events.entrySet()) {
-                for(ChallengeEvent evt : entry.getValue()) {
+                for (ChallengeEvent evt : entry.getValue()) {
                     es.add(evt);
                 }
+            }
+        }
+
+        return es;
+    }
+
+    public List<ChallengeEvent> getByType(ChallengeEventType type) {
+        List<ChallengeEvent> es = new ArrayList<>();
+
+        for (ChallengeEvent event : getEvents()) {
+            if (event.getType().equals(type)) {
+                es.add(event);
             }
         }
 
@@ -46,7 +57,7 @@ public class ChallengeEventManager {
         if (!getEvents().contains(event)) {
             List<ChallengeEvent> plEv = new ArrayList<>();
 
-            if(!events.isEmpty()) {
+            if (!events.isEmpty()) {
                 if (events.containsKey(plugin)) {
                     plEv = events.get(plugin);
                 }
@@ -84,11 +95,11 @@ public class ChallengeEventManager {
     }
 
     private Plugin getRegisterer(ChallengeEvent event) {
-        for(Map.Entry<Plugin, List<ChallengeEvent>> entry : events.entrySet()) {
+        for (Map.Entry<Plugin, List<ChallengeEvent>> entry : events.entrySet()) {
             List<ChallengeEvent> eventsByRegisterer = entry.getValue();
 
-            for(ChallengeEvent evt : eventsByRegisterer) {
-                if(evt.equals(event)) {
+            for (ChallengeEvent evt : eventsByRegisterer) {
+                if (evt.equals(event)) {
                     return entry.getKey();
                 }
             }
@@ -99,7 +110,7 @@ public class ChallengeEventManager {
     private FileBuilder getFile(ChallengeEvent event) {
         Plugin registerer = getRegisterer(event);
 
-        if(registerer != null) {
+        if (registerer != null) {
             FileBuilder fb = new FileBuilder(ChallengeBase.getInstance().getPluginFolder(registerer), "achieved_events.yml");
 
             if (!fb.exists()) {
@@ -138,8 +149,8 @@ public class ChallengeEventManager {
     public List<ChallengeEvent> getAchieved() {
         List<ChallengeEvent> achieved = new ArrayList<>();
 
-        for(ChallengeEvent event : getEvents()) {
-            if(achieved(event)) achieved.add(event);
+        for (ChallengeEvent event : getEvents()) {
+            if (achieved(event)) achieved.add(event);
         }
 
         return achieved;

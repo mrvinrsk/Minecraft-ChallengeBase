@@ -11,5 +11,6 @@ public interface ChallengeEvent extends Listener {
     String getConfigName();
     List<String> getDescription();
     ItemStack getIcon();
+    ChallengeEventType getType();
 
 }

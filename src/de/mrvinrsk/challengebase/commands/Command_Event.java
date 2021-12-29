@@ -4,6 +4,7 @@ import de.chatvergehen.spigotapi.util.instances.Item;
 import de.mrvinrsk.challengebase.main.ChallengeBase;
 import de.mrvinrsk.challengebase.util.ChallengeEvent;
 import de.mrvinrsk.challengebase.util.ChallengeEventManager;
+import de.mrvinrsk.challengebase.util.ChallengeEventType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -13,7 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -23,7 +26,56 @@ public class Command_Event implements CommandExecutor, Listener {
 
     ChallengeEventManager eventManager = ChallengeEventManager.getManager();
     Plugin plugin = ChallengeBase.getInstance();
-    private String inventoryTitle = "§2Alle Events";
+
+    private String allInventoryTitle = "§eAlle Events";
+    private String chooseInventoryTitle = "§7Welche Events anzeigen?";
+
+    private ItemStack getIconByType(ChallengeEventType type) {
+        Item icon = new Item(type.getMaterial());
+        icon.setName(type.getIconTitle());
+
+        icon.addLoreLine("§8» §7§oEvents in dieser Kategorie: §f" + eventManager.getByType(type).size());
+        return icon.getItemStack();
+    }
+
+    private Item getEventIcon(ChallengeEvent event) {
+        Item item = new Item(Material.GUNPOWDER);
+
+        if (!eventManager.achieved(event)) {
+            StringBuilder obfName = new StringBuilder();
+            for (int i = 0; i < event.getEventName().length(); i++) {
+                obfName.append("0");
+            }
+            item.setName("§7§k§n" + obfName);
+            item.addLoreLine("§7§oEvent-Typ: " + (event.getType() == ChallengeEventType.POSITIVE ? "§aPositiv" : "§cNegativ"));
+            item.addLoreLine("§8§oDieses Event wurde noch nicht entdeckt.");
+            item.addLoreLine("§0");
+            item.addLoreLine("§7§oSobald das Event ein mal ausgelöst wurde,");
+            item.addLoreLine("§7§okann hier die Beschreibung eingesehen werden.");
+        } else {
+            item = new Item(event.getIcon());
+            item.setName("§a§n" + event.getEventName());
+            item.addLoreLine("§7§oEvent-Typ: " + (event.getType() == ChallengeEventType.POSITIVE ? "§aPositiv" : "§cNegativ"));
+            item.addLoreLine("");
+            item.addLoreLine("§f§nBeschreibung");
+
+            for (String desc : event.getDescription()) {
+                String dsc = desc;
+
+                if (event.getDescription().get(0).equalsIgnoreCase(desc)) {
+                    dsc = "„" + dsc;
+                }
+
+                if (event.getDescription().get(event.getDescription().size() - 1).equalsIgnoreCase(desc)) {
+                    dsc += "“";
+                }
+
+                item.addLoreLine("§7§o" + dsc);
+            }
+        }
+
+        return item;
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -32,41 +84,10 @@ public class Command_Event implements CommandExecutor, Listener {
             if (!(cs instanceof Player)) return true;
 
             Player p = (Player) cs;
-            Inventory inv = Bukkit.createInventory(null, 9 * 4, inventoryTitle);
+            Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, chooseInventoryTitle);
 
-            for(ChallengeEvent event : eventManager.getEvents()) {
-                Item item = new Item(Material.GUNPOWDER);
-
-                if(!eventManager.achieved(event)) {
-                    StringBuilder obfName = new StringBuilder();
-                    for (int i = 0; i < event.getEventName().length(); i++) {
-                        obfName.append("0");
-                    }
-                    item.setName("§7§k§n" + obfName);
-                    item.addLoreLine("§8§oDieses Event wurde noch nicht entdeckt.");
-                    item.addLoreLine("§0");
-                    item.addLoreLine("§7§oSobald das Event ein mal ausgelöst wurde,");
-                    item.addLoreLine("§7§okann hier die Beschreibung eingesehen werden.");
-                }else {
-                    item = new Item(event.getIcon());
-                    item.setName("§a§n" + event.getEventName());
-
-                    for(String desc : event.getDescription()) {
-                        String dsc = desc;
-
-                        if(event.getDescription().get(0).equalsIgnoreCase(desc)) {
-                            dsc = "„" + dsc;
-                        }
-
-                        if(event.getDescription().get(event.getDescription().size()-1).equalsIgnoreCase(desc)) {
-                            dsc += "“";
-                        }
-
-                        item.addLoreLine("§7§o" + dsc);
-                    }
-                }
-
-                inv.addItem(item.getItemStack());
+            for (ChallengeEventType type : ChallengeEventType.values()) {
+                inv.addItem(getIconByType(type));
             }
 
             p.openInventory(inv);
@@ -101,13 +122,45 @@ public class Command_Event implements CommandExecutor, Listener {
 
     @EventHandler
     public void cancelClick(InventoryClickEvent e) {
-        if(!(e.getWhoClicked() instanceof Player)) return;
+        if (!(e.getWhoClicked() instanceof Player)) return;
 
-        if(e.getClickedInventory() != null) {
-            if(e.getView().getTitle().equalsIgnoreCase(inventoryTitle)) {
-                e.setCancelled(true);
+        if (e.getClickedInventory() != null) {
+            if (e.getCurrentItem() != null) {
+                if (e.getCurrentItem().hasItemMeta()) {
+                    if (e.getView().getTitle().equalsIgnoreCase(allInventoryTitle)) {
+                        e.setCancelled(true);
+                    } else {
+                        for (ChallengeEventType type : ChallengeEventType.values()) {
+                            if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(type.getIconTitle())) {
+                                e.setCancelled(true);
+
+                                e.getWhoClicked().openInventory(getByType(type));
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private Inventory getAll() {
+        Inventory inv = Bukkit.createInventory(null, 9 * 4, allInventoryTitle);
+
+        for (ChallengeEvent event : eventManager.getEvents()) {
+            inv.addItem(getEventIcon(event).getItemStack());
+        }
+
+        return inv;
+    }
+
+    public Inventory getByType(ChallengeEventType type) {
+        Inventory inv = Bukkit.createInventory(null, 9 * 3, type.getIconTitle());
+
+        for (ChallengeEvent event : eventManager.getByType(type)) {
+            inv.addItem(getEventIcon(event).getItemStack());
+        }
+
+        return inv;
     }
 
 }
