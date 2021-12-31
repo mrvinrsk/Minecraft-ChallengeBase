@@ -13,3 +13,7 @@ commands:
     description: De-/Aktiviere Challenge-Plugins
   event:
     description: Liste alle Events die registriert wurden.
+  points:
+    description: Prüfe deine oder die Punkte von anderen Mitspielern.
+  leaderboard:
+    description: Schaue, wer aktuell am Führen ist.

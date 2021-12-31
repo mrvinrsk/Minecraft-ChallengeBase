@@ -90,6 +90,32 @@ public class Listener_EventTrigger implements Listener {
                     }
                 }
             }
+
+            PointManager pm = PointManager.getInstance(e.getPlayer().getUniqueId(), e.getPlugin());
+            int points = 10;
+            pm.addPoints(points);
+            gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rfür das Entdecken des Events §a" + e.getEvent().getEventName() + " §rerhalten.");
+        }
+
+        if (e.getEvent() instanceof PointEarningEvent) {
+            PointEarningEvent pee = (PointEarningEvent) e.getEvent();
+            PointManager pm = PointManager.getInstance(e.getPlayer().getUniqueId(), e.getPlugin());
+            int points = pee.getPoints();
+
+            switch (pee.getPointEventType()) {
+                case ADD -> {
+                    pm.addPoints(points);
+                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rfür das Event §a" + e.getEvent().getEventName() + " §rerhalten.");
+                }
+                case SET -> {
+                    pm.setPoints(points);
+                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Deine Punkte wurden durch das Event §a" + e.getEvent().getEventName() + " §rauf §a" + points + " §rgesetzt.");
+                }
+                case REMOVE -> {
+                    pm.removePoints(points);
+                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rdurch das Event §a" + e.getEvent().getEventName() + " §rverloren.");
+                }
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import de.mrvinrsk.challengebase.main.ChallengeBase;
 import de.mrvinrsk.challengebase.util.ChallengeEvent;
 import de.mrvinrsk.challengebase.util.ChallengeEventManager;
 import de.mrvinrsk.challengebase.util.ChallengeEventType;
+import de.mrvinrsk.challengebase.util.PointEarningEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -39,15 +40,44 @@ public class Command_Event implements CommandExecutor, Listener {
     }
 
     private Item getEventIcon(ChallengeEvent event) {
-        Item item = new Item(Material.GUNPOWDER);
+        Item item = new Item(Material.LIGHT_GRAY_DYE);
+
+        String type = "";
+
+        switch (event.getType()) {
+            case POSITIVE:
+                type = "§aPositiv";
+                break;
+
+            case NEGATIVE:
+                type = "§cNegativ";
+                break;
+
+            case POINTS:
+                if (event instanceof PointEarningEvent) {
+                    type = switch (((PointEarningEvent) event).getPointEventType()) {
+                        case ADD -> "§aPunkte erhalten";
+                        case REMOVE -> "§cPunkte verlieren";
+                        case SET -> "§ePunkte setzen";
+                    };
+                } else {
+                    type = "§fUndefiniert";
+                }
+                break;
+
+            default:
+                type = "§fUndefiniert";
+                break;
+        }
 
         if (!eventManager.achieved(event)) {
             StringBuilder obfName = new StringBuilder();
             for (int i = 0; i < event.getEventName().length(); i++) {
                 obfName.append("0");
             }
+
             item.setName("§7§k§n" + obfName);
-            item.addLoreLine("§7§oEvent-Typ: " + (event.getType() == ChallengeEventType.POSITIVE ? "§aPositiv" : "§cNegativ"));
+            item.addLoreLine("§7§oEvent-Typ: " + type);
             item.addLoreLine("§8§oDieses Event wurde noch nicht entdeckt.");
             item.addLoreLine("§0");
             item.addLoreLine("§7§oSobald das Event ein mal ausgelöst wurde,");
@@ -55,7 +85,7 @@ public class Command_Event implements CommandExecutor, Listener {
         } else {
             item = new Item(event.getIcon());
             item.setName("§a§n" + event.getEventName());
-            item.addLoreLine("§7§oEvent-Typ: " + (event.getType() == ChallengeEventType.POSITIVE ? "§aPositiv" : "§cNegativ"));
+            item.addLoreLine("§7§oEvent-Typ: " + type);
             item.addLoreLine("");
             item.addLoreLine("§f§nBeschreibung");
 

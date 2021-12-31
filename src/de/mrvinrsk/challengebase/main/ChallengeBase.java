@@ -3,6 +3,8 @@ package de.mrvinrsk.challengebase.main;
 import de.chatvergehen.spigotapi.util.filemanaging.FolderBuilder;
 import de.mrvinrsk.challengebase.commands.Command_Challenge;
 import de.mrvinrsk.challengebase.commands.Command_Event;
+import de.mrvinrsk.challengebase.commands.Command_Leaderboard;
+import de.mrvinrsk.challengebase.commands.Command_Points;
 import de.mrvinrsk.challengebase.listeners.Listener_EventTrigger;
 import de.mrvinrsk.challengebase.listeners.Listener_ServerLoad;
 import de.mrvinrsk.challengebase.util.Gameplay;
@@ -23,11 +25,11 @@ public class ChallengeBase extends JavaPlugin {
         return instance;
     }
 
-    public FolderBuilder getPluginFolder(Plugin plugin) {
+    public static FolderBuilder getPluginFolder(Plugin plugin) {
         return new FolderBuilder("plugins//" + plugin.getDataFolder().getName());
     }
 
-    public FolderBuilder getUserFolder(Plugin plugin, UUID uuid) {
+    public static FolderBuilder getUserFolder(Plugin plugin, UUID uuid) {
         return new FolderBuilder(getPluginFolder(plugin).getPath() + "//Users//" + uuid.toString());
     }
 
@@ -38,6 +40,8 @@ public class ChallengeBase extends JavaPlugin {
 
         getCommand("challenge").setExecutor(new Command_Challenge());
         getCommand("event").setExecutor(new Command_Event());
+        getCommand("points").setExecutor(new Command_Points());
+        getCommand("leaderboard").setExecutor(new Command_Leaderboard());
 
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Listener_ServerLoad(), this);

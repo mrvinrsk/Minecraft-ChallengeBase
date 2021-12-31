@@ -156,8 +156,8 @@ public class ChallengeEventManager {
         return achieved;
     }
 
-    public void triggerEvent(Player player, ChallengeEvent event) {
-        Bukkit.getPluginManager().callEvent(new ChallengeEventTriggerEvent(player, event));
+    public void triggerEvent(Player player, ChallengeEvent event, Plugin plugin) {
+        Bukkit.getPluginManager().callEvent(new ChallengeEventTriggerEvent(player, event, plugin));
     }
 
 }
