@@ -74,6 +74,47 @@ public class ChallengeEventManager {
         }
     }
 
+    public List<PercentageChallengeEvent> getPercentageEvents() {
+        List<PercentageChallengeEvent> pces = new ArrayList<>();
+
+        for (ChallengeEvent event : getEvents()) {
+            if (event instanceof PercentageChallengeEvent) {
+                pces.add((PercentageChallengeEvent) event);
+            }
+        }
+
+        return pces;
+    }
+
+    private FileBuilder getPercentageFile(Player p, Plugin plugin) {
+        return new FileBuilder(ChallengeBase.getUserFolder(plugin, p.getUniqueId()), "eventPercentages.yml");
+    }
+
+    public double getPercentage(Player player, PercentageChallengeEvent percentageChallenge) {
+        if (ChallengeBase.getUserFolder(getRegisterer(percentageChallenge), player.getUniqueId()).exists()) {
+            if (getPercentageFile(player, getRegisterer(percentageChallenge)).exists()) {
+                ConfigEditor ce = getPercentageFile(player, getRegisterer(percentageChallenge)).getConfig();
+
+                if (ce.contains(percentageChallenge.getConfigName().toUpperCase())) {
+                    return (double) ce.get(percentageChallenge.getConfigName().toUpperCase());
+                }
+            }
+        }
+        return percentageChallenge.getBasePercentage();
+    }
+
+    public void setPercentage(Player player, PercentageChallengeEvent percentageChallenge, double percentage) {
+        FileBuilder fb = getPercentageFile(player, getRegisterer(percentageChallenge));
+
+        if (!fb.exists()) {
+            fb.create();
+        }
+
+        ConfigEditor ce = fb.getConfig();
+
+        ce.set(percentageChallenge.getConfigName().toUpperCase(), percentage);
+    }
+
     public void unregisterEvent(ChallengeEvent event, Plugin plugin) {
         List<ChallengeEvent> ev = events.get(plugin);
 
@@ -94,7 +135,7 @@ public class ChallengeEventManager {
         return null;
     }
 
-    private Plugin getRegisterer(ChallengeEvent event) {
+    public Plugin getRegisterer(ChallengeEvent event) {
         for (Map.Entry<Plugin, List<ChallengeEvent>> entry : events.entrySet()) {
             List<ChallengeEvent> eventsByRegisterer = entry.getValue();
 

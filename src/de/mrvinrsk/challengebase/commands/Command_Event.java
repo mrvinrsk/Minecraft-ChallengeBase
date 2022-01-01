@@ -2,10 +2,7 @@ package de.mrvinrsk.challengebase.commands;
 
 import de.chatvergehen.spigotapi.util.instances.Item;
 import de.mrvinrsk.challengebase.main.ChallengeBase;
-import de.mrvinrsk.challengebase.util.ChallengeEvent;
-import de.mrvinrsk.challengebase.util.ChallengeEventManager;
-import de.mrvinrsk.challengebase.util.ChallengeEventType;
-import de.mrvinrsk.challengebase.util.PointEarningEvent;
+import de.mrvinrsk.challengebase.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -39,7 +36,7 @@ public class Command_Event implements CommandExecutor, Listener {
         return icon.getItemStack();
     }
 
-    private Item getEventIcon(ChallengeEvent event) {
+    private Item getEventIcon(ChallengeEvent event, Player player, Plugin plugin) {
         Item item = new Item(Material.LIGHT_GRAY_DYE);
 
         String type = "";
@@ -70,6 +67,16 @@ public class Command_Event implements CommandExecutor, Listener {
                 break;
         }
 
+        if (event instanceof PercentageChallengeEvent) {
+            PercentageChallengeEvent pce = (PercentageChallengeEvent) event;
+
+            if (pce.getBasePercentage() == eventManager.getPercentage(player, pce)) {
+                type += " §8(§f" + eventManager.getPercentage(player, pce) + "%§8)";
+            } else {
+                type += " §8(§7§m§o" + pce.getBasePercentage() + "%§r §f" + eventManager.getPercentage(player, pce) + "%§8)";
+            }
+        }
+
         if (!eventManager.achieved(event)) {
             StringBuilder obfName = new StringBuilder();
             for (int i = 0; i < event.getEventName().length(); i++) {
@@ -89,20 +96,23 @@ public class Command_Event implements CommandExecutor, Listener {
             item.addLoreLine("");
             item.addLoreLine("§f§nBeschreibung");
 
-            for (String desc : event.getDescription()) {
+            for (String desc : event.getDescription(player)) {
                 String dsc = desc;
 
-                if (event.getDescription().get(0).equalsIgnoreCase(desc)) {
+                if (event.getDescription(player).get(0).equalsIgnoreCase(desc)) {
                     dsc = "„" + dsc;
                 }
 
-                if (event.getDescription().get(event.getDescription().size() - 1).equalsIgnoreCase(desc)) {
+                if (event.getDescription(player).get(event.getDescription(player).size() - 1).equalsIgnoreCase(desc)) {
                     dsc += "“";
                 }
 
                 item.addLoreLine("§7§o" + dsc);
             }
         }
+
+        item.addLoreLine("§1");
+        item.addLoreLine("§7§oChallenge von §f§o" + eventManager.getRegisterer(event).getName());
 
         return item;
     }
@@ -164,7 +174,9 @@ public class Command_Event implements CommandExecutor, Listener {
                             if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(type.getIconTitle())) {
                                 e.setCancelled(true);
 
-                                e.getWhoClicked().openInventory(getByType(type));
+                                e.getWhoClicked().openInventory(getByType(type, ((Player) e.getWhoClicked()).getPlayer(), plugin));
+                            }else if(e.getView().getTitle().equalsIgnoreCase(type.getIconTitle())) {
+                                e.setCancelled(true);
                             }
                         }
                     }
@@ -173,21 +185,22 @@ public class Command_Event implements CommandExecutor, Listener {
         }
     }
 
-    private Inventory getAll() {
+    private Inventory getAll(Player player, Plugin plugin) {
         Inventory inv = Bukkit.createInventory(null, 9 * 4, allInventoryTitle);
 
         for (ChallengeEvent event : eventManager.getEvents()) {
-            inv.addItem(getEventIcon(event).getItemStack());
+            inv.addItem(getEventIcon(event, player, plugin).getItemStack());
         }
 
         return inv;
     }
 
-    public Inventory getByType(ChallengeEventType type) {
+    public Inventory getByType(ChallengeEventType type, Player player, Plugin plugin) {
         Inventory inv = Bukkit.createInventory(null, 9 * 3, type.getIconTitle());
 
+        int i = 0;
         for (ChallengeEvent event : eventManager.getByType(type)) {
-            inv.addItem(getEventIcon(event).getItemStack());
+            inv.setItem(i++, getEventIcon(event, player, plugin).getItemStack());
         }
 
         return inv;

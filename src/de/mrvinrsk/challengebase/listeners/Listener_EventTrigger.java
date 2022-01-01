@@ -33,14 +33,14 @@ public class Listener_EventTrigger implements Listener {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage("§r §r §e§o" + p.getName() + " §fhat das Event §a§o" + event.getEventName() + " §fentdeckt:");
             Bukkit.broadcastMessage("");
-            for (String desc : event.getDescription()) {
+            for (String desc : event.getDescription(p)) {
                 String dsc = desc;
 
-                if (event.getDescription().get(0).equalsIgnoreCase(desc)) {
+                if (event.getDescription(p).get(0).equalsIgnoreCase(desc)) {
                     dsc = "„" + dsc;
                 }
 
-                if (event.getDescription().get(event.getDescription().size() - 1).equalsIgnoreCase(desc)) {
+                if (event.getDescription(p).get(event.getDescription(p).size() - 1).equalsIgnoreCase(desc)) {
                     dsc += "“";
                 }
 
