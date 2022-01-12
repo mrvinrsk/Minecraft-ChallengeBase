@@ -1,6 +1,8 @@
 package de.mrvinrsk.challengebase.commands;
 
 import de.chatvergehen.spigotapi.util.instances.Item;
+import de.chatvergehen.spigotapi.util.inventories.ChestSlot;
+import de.chatvergehen.spigotapi.util.math.PercentageCalculator;
 import de.mrvinrsk.challengebase.main.ChallengeBase;
 import de.mrvinrsk.challengebase.util.*;
 import org.bukkit.Bukkit;
@@ -12,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -32,7 +33,11 @@ public class Command_Event implements CommandExecutor, Listener {
         Item icon = new Item(type.getMaterial());
         icon.setName(type.getIconTitle());
 
-        icon.addLoreLine("§8» §7§oEvents in dieser Kategorie: §f" + eventManager.getByType(type).size());
+        if(eventManager.getByType(type).size() >= 1) {
+            icon.addLoreLine("§8» §7§oEntdeckt in dieser Kategorie: §e" + eventManager.getAchievedByType(type).size() + "§7/§6" + eventManager.getByType(type).size());
+        }else {
+            icon.addLoreLine("§8» §c§oDiese Kategorie beinhält keine Events.");
+        }
         return icon.getItemStack();
     }
 
@@ -43,11 +48,9 @@ public class Command_Event implements CommandExecutor, Listener {
 
         switch (event.getType()) {
             case POSITIVE:
-                type = "§aPositiv";
-                break;
-
             case NEGATIVE:
-                type = "§cNegativ";
+            case UNKNOWN:
+                type = event.getType().getIconTitle();
                 break;
 
             case POINTS:
@@ -69,6 +72,8 @@ public class Command_Event implements CommandExecutor, Listener {
 
         if (event instanceof PercentageChallengeEvent) {
             PercentageChallengeEvent pce = (PercentageChallengeEvent) event;
+
+            type += " §7& §3Prozentual";
 
             if (pce.getBasePercentage() == eventManager.getPercentage(player, pce)) {
                 type += " §8(§f" + eventManager.getPercentage(player, pce) + "%§8)";
@@ -117,6 +122,29 @@ public class Command_Event implements CommandExecutor, Listener {
         return item;
     }
 
+    private ItemStack getInfoIcon() {
+        PercentageCalculator pc = new PercentageCalculator();
+
+        Item item = new Item(Material.PAPER)
+                .setName("§aFortschritt")
+                .addLoreLine("§7Es gibt aktuell §e" + eventManager.getEvents().size() + " " + (eventManager.getEvents().size() == 1 ? "Event" : "Events") + "§7,")
+                .addLoreLine("§7davon " + (eventManager.getEvents().size() == 1 ? "wurde" : "wurden") + " bisher §6" + (eventManager.getAchieved().size() >= 1 ? eventManager.getAchieved().size() : "keine") + " §7entdeckt.")
+                .addLoreLine("§7Das sind §a" + Math.round(pc.getPercentage(eventManager.getAchieved().size(), eventManager.getEvents().size())) + "%§7.");
+
+        return item.getItemStack();
+    }
+
+    private void openMain(Player p) {
+        Inventory inv = Bukkit.createInventory(null, 9 * 1, chooseInventoryTitle);
+
+        for (ChallengeEventType type : ChallengeEventType.values()) {
+            inv.addItem(getIconByType(type));
+        }
+        inv.setItem(ChestSlot.getSlot(1, 9), getInfoIcon());
+
+        p.openInventory(inv);
+    }
+
     @SuppressWarnings("rawtypes")
     @Override
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
@@ -124,13 +152,7 @@ public class Command_Event implements CommandExecutor, Listener {
             if (!(cs instanceof Player)) return true;
 
             Player p = (Player) cs;
-            Inventory inv = Bukkit.createInventory(null, InventoryType.HOPPER, chooseInventoryTitle);
-
-            for (ChallengeEventType type : ChallengeEventType.values()) {
-                inv.addItem(getIconByType(type));
-            }
-
-            p.openInventory(inv);
+            openMain(p);
         } else if (args.length == 1) {
             if (args[0].equalsIgnoreCase("help")) {
                 cs.sendMessage("/" + label);
@@ -167,21 +189,29 @@ public class Command_Event implements CommandExecutor, Listener {
         if (e.getClickedInventory() != null) {
             if (e.getCurrentItem() != null) {
                 if (e.getCurrentItem().hasItemMeta()) {
-                    if (e.getView().getTitle().equalsIgnoreCase(allInventoryTitle)) {
+                    if (e.getView().getTitle().equalsIgnoreCase(chooseInventoryTitle)) {
                         e.setCancelled(true);
-                    } else {
+
                         for (ChallengeEventType type : ChallengeEventType.values()) {
                             if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(type.getIconTitle())) {
-                                e.setCancelled(true);
-
                                 e.getWhoClicked().openInventory(getByType(type, ((Player) e.getWhoClicked()).getPlayer(), plugin));
-                            }else if(e.getView().getTitle().equalsIgnoreCase(type.getIconTitle())) {
+                            } else if (e.getView().getTitle().equalsIgnoreCase(type.getIconTitle())) {
+                                e.setCancelled(true);
+                            }
+                        }
+                    } else {
+                        for (ChallengeEventType type : ChallengeEventType.values()) {
+                            if (e.getView().getTitle().equalsIgnoreCase(type.getIconTitle())) {
                                 e.setCancelled(true);
                             }
                         }
                     }
                 }
             }
+        }
+
+        if (e.getCurrentItem().isSimilar(getBack())) {
+            openMain((Player) e.getWhoClicked());
         }
     }
 
@@ -195,13 +225,25 @@ public class Command_Event implements CommandExecutor, Listener {
         return inv;
     }
 
+    private ItemStack getBack() {
+        return new Item(Material.OAK_DOOR)
+                .setName("§f« §cZurück zu allen Event-Typen")
+                .getItemStack();
+    }
+
     public Inventory getByType(ChallengeEventType type, Player player, Plugin plugin) {
         Inventory inv = Bukkit.createInventory(null, 9 * 3, type.getIconTitle());
 
-        int i = 0;
-        for (ChallengeEvent event : eventManager.getByType(type)) {
-            inv.setItem(i++, getEventIcon(event, player, plugin).getItemStack());
+        if(eventManager.getByType(type).size() >= 1) {
+            int i = 0;
+            for (ChallengeEvent event : eventManager.getByType(type)) {
+                inv.setItem(i++, getEventIcon(event, player, plugin).getItemStack());
+            }
+        }else {
+            inv.setItem(ChestSlot.getSlot(2, 5), new Item(Material.BARRIER).setName("§cKeine Events").addLoreLine("§7In dieser Kategorie gibt es keine Events.").getItemStack());
         }
+
+        inv.setItem(ChestSlot.getSlot(3, 9), getBack());
 
         return inv;
     }

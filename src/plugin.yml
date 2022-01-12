@@ -17,3 +17,6 @@ commands:
     description: Prüfe deine oder die Punkte von anderen Mitspielern.
   leaderboard:
     description: Schaue, wer aktuell am Führen ist.
+  vanish:
+    aliases:
+      - v

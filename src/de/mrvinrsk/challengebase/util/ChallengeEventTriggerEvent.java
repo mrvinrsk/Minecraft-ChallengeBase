@@ -1,13 +1,18 @@
 package de.mrvinrsk.challengebase.util;
 
+import org.bukkit.craftbukkit.libs.org.eclipse.sisu.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * This event gets fired, whenever a {@link ChallengeEvent} is getting triggered.
+ */
 public class ChallengeEventTriggerEvent extends Event {
 
     private static HandlerList handlers = new HandlerList();
+
     public static HandlerList getHandlerList() {
         return handlers;
     }
@@ -22,7 +27,7 @@ public class ChallengeEventTriggerEvent extends Event {
     private ChallengeEventManager eventManager;
     private Plugin plugin;
 
-    public ChallengeEventTriggerEvent(Player player, ChallengeEvent event, Plugin plugin) {
+    public ChallengeEventTriggerEvent(@Nullable Player player, ChallengeEvent event, Plugin plugin) {
         this.player = player;
         this.event = event;
         this.plugin = plugin;

@@ -31,7 +31,12 @@ public class Listener_EventTrigger implements Listener {
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage("§6§k00000000000000000000000000000000000000000000000000000");
             Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage("§r §r §e§o" + p.getName() + " §fhat das Event §a§o" + event.getEventName() + " §fentdeckt:");
+
+            if (p != null) {
+                Bukkit.broadcastMessage("§r §r §e§o" + p.getName() + " §fhat das Event §a§o" + event.getEventName() + " §fentdeckt:");
+            } else {
+                Bukkit.broadcastMessage("§r §r §e§oDas Event §a§o" + event.getEventName() + " §fwurde entdeckt:");
+            }
             Bukkit.broadcastMessage("");
             for (String desc : event.getDescription(p)) {
                 String dsc = desc;
@@ -54,6 +59,23 @@ public class Listener_EventTrigger implements Listener {
             Bukkit.broadcastMessage("§6§k00000000000000000000000000000000000000000000000000000");
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage("");
+
+
+            if (p != null) {
+                if(e.getEvent().getDiscoverPoints() != 0) {
+                    int points = 10;
+                    if(e.getEvent().getDiscoverPoints() != -1) {
+                        points = e.getEvent().getDiscoverPoints();
+                    }
+
+                    PointManager pm = PointManager.getInstance(p.getUniqueId(), e.getPlugin());
+                    pm.addPoints(points);
+                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rfür das Entdecken des Events §a" + e.getEvent().getEventName() + " §rerhalten.");
+                }
+
+                p.sendTitle("§fDu hast ein Event entdeckt", "§a§o" + event.getEventName(), 0, 65, 15);
+            }
+
 
             if (eventManager.getAchieved().size() == eventManager.getEvents().size()) {
                 Bukkit.broadcastMessage("");
@@ -90,11 +112,6 @@ public class Listener_EventTrigger implements Listener {
                     }
                 }
             }
-
-            PointManager pm = PointManager.getInstance(e.getPlayer().getUniqueId(), e.getPlugin());
-            int points = 10;
-            pm.addPoints(points);
-            gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rfür das Entdecken des Events §a" + e.getEvent().getEventName() + " §rerhalten.");
         }
 
         if (e.getEvent() instanceof PointEarningEvent) {
@@ -105,7 +122,7 @@ public class Listener_EventTrigger implements Listener {
             switch (pee.getPointEventType()) {
                 case ADD -> {
                     pm.addPoints(points);
-                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rfür das Event §a" + e.getEvent().getEventName() + " §rerhalten.");
+                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast Punkte für das Event §a" + e.getEvent().getEventName() + " §rerhalten.");
                 }
                 case SET -> {
                     pm.setPoints(points);

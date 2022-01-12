@@ -4,9 +4,10 @@ import org.bukkit.Material;
 
 public enum ChallengeEventType {
 
-    POSITIVE("§2Positive Events", Material.LIME_WOOL),
-    NEGATIVE("§cNegative Events", Material.RED_WOOL),
-    POINTS("§cPunkte erhalten", Material.GOLD_INGOT);
+    POSITIVE("§2Positiv", Material.LIME_WOOL),
+    NEGATIVE("§cNegativ", Material.RED_WOOL),
+    UNKNOWN("§fUnbestimmt", Material.LIGHT_GRAY_WOOL),
+    POINTS("§6Punkte", Material.GOLD_INGOT);
 
     private String iconTitle;
     private Material material;
