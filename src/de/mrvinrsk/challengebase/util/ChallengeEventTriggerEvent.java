@@ -35,18 +35,38 @@ public class ChallengeEventTriggerEvent extends Event {
         this.eventManager = ChallengeEventManager.getManager();
     }
 
+    /**
+     * Get the player who triggered the event.
+     *
+     * @return the player.
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Get the event which was triggered.
+     *
+     * @return the event.
+     */
     public ChallengeEvent getEvent() {
         return event;
     }
 
+    /**
+     * Get an instance from {@link ChallengeEventManager}.
+     *
+     * @return the instance.
+     */
     public ChallengeEventManager getEventManager() {
         return eventManager;
     }
 
+    /**
+     * Get the plugin from which the event was registered.
+     *
+     * @return the plugin.
+     */
     public Plugin getPlugin() {
         return plugin;
     }

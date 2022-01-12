@@ -17,6 +17,7 @@ public class ChallengeEventManager {
 
     /**
      * Get an instance of this class.
+     *
      * @return the instance.
      */
     public static ChallengeEventManager getManager() {
@@ -290,12 +291,18 @@ public class ChallengeEventManager {
         return achieved;
     }
 
+    /**
+     * Get all discovered events from one specific type.
+     *
+     * @param type the type.
+     * @return list of discovered events.
+     */
     public List<ChallengeEvent> getAchievedByType(ChallengeEventType type) {
         List<ChallengeEvent> achieved = new ArrayList<>();
         List<ChallengeEvent> allAchieved = getAchieved();
 
-        for(ChallengeEvent event : allAchieved) {
-            if(event.getType() == type) {
+        for (ChallengeEvent event : allAchieved) {
+            if (event.getType() == type) {
                 achieved.add(event);
             }
         }
@@ -305,6 +312,7 @@ public class ChallengeEventManager {
 
     /**
      * Trigger the {@link ChallengeEventTriggerEvent}.
+     * Needed in all events.
      *
      * @param player the player who triggered this event.
      * @param event  the event which was triggered.

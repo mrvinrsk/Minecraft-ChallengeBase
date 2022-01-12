@@ -2,7 +2,6 @@ package de.mrvinrsk.challengebase.util;
 
 import de.chatvergehen.spigotapi.util.filemanaging.ConfigEditor;
 import de.chatvergehen.spigotapi.util.filemanaging.FileBuilder;
-import de.chatvergehen.spigotapi.util.filemanaging.FolderBuilder;
 import de.mrvinrsk.challengebase.main.ChallengeBase;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -19,6 +18,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * This is a utility class which simplifies some of the most used actions used in challenge plugins
+ * such as sending messages with a consistent formatting.
+ */
 public class Gameplay implements Listener {
 
     private static Gameplay INSTANCE;

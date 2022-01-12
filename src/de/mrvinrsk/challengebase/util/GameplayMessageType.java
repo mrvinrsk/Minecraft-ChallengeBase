@@ -1,8 +1,13 @@
 package de.mrvinrsk.challengebase.util;
 
+import org.bukkit.entity.Player;
+
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents the type of a {@link Gameplay} Message sent by {@link Gameplay#sendMessage(Player, GameplayMessageType, String)}
+ */
 public enum GameplayMessageType {
 
     SYSTEM(" §8» <<Message>>", "§7§o");

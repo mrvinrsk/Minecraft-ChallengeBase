@@ -98,7 +98,7 @@ public class PointManager {
      */
     public int getPoints() {
         if (getFile().exists() || Bukkit.getPlayer(getUUID()) != null) {
-            if(!getFile().exists()) {
+            if (!getFile().exists()) {
                 setup();
             }
 
