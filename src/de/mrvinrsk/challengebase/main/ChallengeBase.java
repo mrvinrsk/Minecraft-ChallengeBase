@@ -7,6 +7,8 @@ import de.mrvinrsk.challengebase.listeners.Listener_EventTrigger;
 import de.mrvinrsk.challengebase.listeners.Listener_Join;
 import de.mrvinrsk.challengebase.util.ChallengeEventManager;
 import de.mrvinrsk.challengebase.util.Gameplay;
+import de.mrvinrsk.challengebase.util.Goal;
+import de.mrvinrsk.challengebase.util.GoalManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -23,6 +25,7 @@ public class ChallengeBase extends JavaPlugin {
     private static ChallengeBase instance;
     private ChallengeEventManager eventManager = ChallengeEventManager.getManager();
     private Gameplay gameplay = Gameplay.getInstance();
+    private GoalManager goalManager = GoalManager.getInstance();
 
     public static ChallengeBase getInstance() {
         return instance;
@@ -43,6 +46,7 @@ public class ChallengeBase extends JavaPlugin {
 
         getCommand("challenge").setExecutor(new Command_Challenge());
         getCommand("event").setExecutor(new Command_Event());
+        getCommand("goal").setExecutor(new Command_Goal());
         getCommand("points").setExecutor(new Command_Points());
         getCommand("leaderboard").setExecutor(new Command_Leaderboard());
         getCommand("vanish").setExecutor(new Command_Vanish());
@@ -52,8 +56,23 @@ public class ChallengeBase extends JavaPlugin {
         pm.registerEvents(new Listener_EventTrigger(), this);
         pm.registerEvents(new Listener_Join(), this);
         pm.registerEvents(new Command_Event(), this);
+        pm.registerEvents(new Command_Goal(), this);
         pm.registerEvents(new Listener_Death(), this);
         pm.registerEvents(new Gameplay(), this);
+
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Plugin plugin : getChallengePlugins()) {
+                    if (goalManager.getPluginGoals(plugin) == null || goalManager.getPluginGoals(plugin).isEmpty()) {
+                        getLogger().info(plugin.getName() + " registriert keine Ziele!");
+                    } else {
+                        getLogger().info(plugin.getName() + " registriert " + goalManager.getPluginGoals(plugin).size() + " Ziel" + (goalManager.getPluginGoals(plugin).size() != 1 ? "e" : "") + "!");
+                    }
+                }
+            }
+        }.runTaskLater(this, 25L);
 
 
         // Scheduler

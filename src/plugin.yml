@@ -1,6 +1,6 @@
 name: ChallengeBase
 main: de.mrvinrsk.challengebase.main.ChallengeBase
-version: 0.1
+version: 0.2
 author: TotalRational
 
 api-version: 1.17
@@ -13,6 +13,8 @@ commands:
     description: De-/Aktiviere Challenge-Plugins
   event:
     description: Liste alle Events die registriert wurden.
+  goal:
+    description: Liste alle Ziele die registriert wurden.
   points:
     description: Prüfe deine oder die Punkte von anderen Mitspielern.
   leaderboard:

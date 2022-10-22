@@ -1,8 +1,6 @@
 package de.mrvinrsk.challengebase.listeners;
 
-import de.mrvinrsk.challengebase.util.ChallengeEventManager;
-import de.mrvinrsk.challengebase.util.FastBoard;
-import de.mrvinrsk.challengebase.util.PointManager;
+import de.mrvinrsk.challengebase.util.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -51,8 +49,9 @@ public class Listener_Join implements Listener {
         board.updateLines(
                 "",
                 "§7Position: §a" + p.getLocation().getBlockX() + "§7/§a" + p.getLocation().getBlockY() + "§7/§a" + p.getLocation().getBlockZ(),
-                "§7Punkte: §a" + points + " " + (points == 1 ? "Punkt":"Punkte"),
                 "§7Events: §a" + eventManager.getAchieved().size() + "§7/§a" + eventManager.getEvents().size(),
+                "§7Ziele: §a" + GoalManager.getAchieved().size() + "§7/§a" + GoalManager.getAllGoals().size(),
+                "§7Punkte: §a" + points,
                 ""
         );
     }
