@@ -127,7 +127,7 @@ public class GoalManager {
         return (getConfig().get(path) != null && ((Boolean) getConfig().get(path)));
     }
 
-    public static void setReached(Plugin plugin, Goal goal, boolean reached) {
+    public static void setReached(Goal goal, boolean reached) {
         String path = getCompleteConfigGoalName(goal);
         getConfig().set(path, reached);
     }
