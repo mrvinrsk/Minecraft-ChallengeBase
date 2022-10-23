@@ -28,21 +28,6 @@ public class ChallengeEventManager {
         return INSTANCE;
     }
 
-    /**
-     * Get a list of all plugins which contain events.
-     *
-     * @return the list.
-     */
-    public List<Plugin> getChallengePlugins() {
-        List<Plugin> plugins = new ArrayList<>();
-
-        for (Map.Entry<Plugin, List<ChallengeEvent>> entry : events.entrySet()) {
-            plugins.add(entry.getKey());
-        }
-
-        return plugins;
-    }
-
     public HashMap<Plugin, List<ChallengeEvent>> getEventHash() {
         return events;
     }

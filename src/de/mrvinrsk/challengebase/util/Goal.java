@@ -2,11 +2,12 @@ package de.mrvinrsk.challengebase.util;
 
 
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
-public interface Goal {
+public interface Goal extends Listener {
 
     /**
      * Get the name of this goal.

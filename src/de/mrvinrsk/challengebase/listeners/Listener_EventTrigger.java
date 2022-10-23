@@ -62,9 +62,9 @@ public class Listener_EventTrigger implements Listener {
 
 
             if (p != null) {
-                if(e.getEvent().getDiscoverPoints() != 0) {
+                if (e.getEvent().getDiscoverPoints() != 0) {
                     int points = 10;
-                    if(e.getEvent().getDiscoverPoints() != -1) {
+                    if (e.getEvent().getDiscoverPoints() != -1) {
                         points = e.getEvent().getDiscoverPoints();
                     }
 
@@ -122,17 +122,32 @@ public class Listener_EventTrigger implements Listener {
             switch (pee.getPointEventType()) {
                 case ADD -> {
                     pm.addPoints(points);
-                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast Punkte für das Event §a" + e.getEvent().getEventName() + " §rerhalten.");
+                    gameplay.sendActionbar(e.getPlayer(), "§6+" + points + " Punkt" + (points != 1 ? "e" : "") + " §7(§e" + e.getEvent().getEventName() + "§7)");
                 }
                 case SET -> {
                     pm.setPoints(points);
-                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Deine Punkte wurden durch das Event §a" + e.getEvent().getEventName() + " §rauf §a" + points + " §rgesetzt.");
+                    gameplay.sendActionbar(e.getPlayer(), "§6=" + points + " Punkt" + (points != 1 ? "e" : "") + " §7(§e" + e.getEvent().getEventName() + "§7)");
                 }
                 case REMOVE -> {
                     pm.removePoints(points);
-                    gameplay.sendMessage(e.getPlayer(), GameplayMessageType.SYSTEM, "Du hast §a" + points + " " + (points == 1 ? "Punkt" : "Punkte") + " §rdurch das Event §a" + e.getEvent().getEventName() + " §rverloren.");
+                    gameplay.sendActionbar(e.getPlayer(), "§6-" + points + " Punkt" + (points != 1 ? "e" : "") + " §7(§e" + e.getEvent().getEventName() + "§7)");
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void goalReach(ChallengeGoalSucceedEvent e) {
+        Player p = e.getPlayer();
+        Goal goal = e.getGoal();
+        PointManager pm = PointManager.getInstance(null, e.getPlugin());
+
+        for (Player all : Bukkit.getOnlinePlayers()) {
+            pm.changeUUID(all.getUniqueId());
+            pm.addPoints(goal.getPoints());
+
+            gameplay.sendMessage(all, GameplayMessageType.SYSTEM, "§7Das Ziel §a" + goal.getName() + " §7wurde erreicht!");
+            gameplay.sendMessage(all, GameplayMessageType.SYSTEM, "§7Alle grade aktiven Spieler haben §a" + goal.getPoints() + " " + (goal.getPoints() == 1 ? "Punkt" : "Punkte") + " §7erhalten.");
         }
     }
 

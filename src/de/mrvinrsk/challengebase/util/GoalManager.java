@@ -4,6 +4,9 @@ import de.chatvergehen.spigotapi.util.filemanaging.ConfigEditor;
 import de.chatvergehen.spigotapi.util.filemanaging.FileBuilder;
 import de.chatvergehen.spigotapi.util.instances.Item;
 import de.mrvinrsk.challengebase.main.ChallengeBase;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -80,15 +83,12 @@ public class GoalManager {
     /**
      * Register a new goal.
      *
-     * @param plugin the plugin which registers the goal.
      * @param goal   the goal you want to register.
      */
     public static void registerGoal(Plugin plugin, Goal goal) {
-        if (!goals.containsKey(plugin)) {
+        if (!goals.containsKey(goal.getPlugin())) {
             goals.put(plugin, new ArrayList<>());
         }
-
-        System.out.println(getFile().getFile().getPath());
 
         if (!getConfig().contains(getCompleteConfigGoalName(goal))) {
             getConfig().set(getCompleteConfigGoalName(goal), false);
@@ -97,8 +97,10 @@ public class GoalManager {
         List<Goal> g = goals.get(plugin);
         g.add(goal);
         goals.put(plugin, g);
+        Bukkit.getPluginManager().registerEvents(goal, ChallengeBase.getInstance());
 
-        ChallengeBase.getInstance().getLogger().info("Registered goal " + goal.getName() + " from " + plugin.getName());
+
+        ChallengeBase.getInstance().getLogger().info("Registered goal " + goal.getName() + " from " + goal.getPlugin().getName());
     }
 
     private static String getCompleteConfigGoalName(Goal goal) {
@@ -127,9 +129,14 @@ public class GoalManager {
         return (getConfig().get(path) != null && ((Boolean) getConfig().get(path)));
     }
 
-    public static void setReached(Goal goal, boolean reached) {
+    public static void setReached(@Nullable Player p, Goal goal, boolean reached) {
         String path = getCompleteConfigGoalName(goal);
         getConfig().set(path, reached);
+
+        if(reached) {
+            ChallengeGoalSucceedEvent event = new ChallengeGoalSucceedEvent(p, goal);
+            Bukkit.getPluginManager().callEvent(event);
+        }
     }
 
     public static Item getGoalItem(Goal goal) {

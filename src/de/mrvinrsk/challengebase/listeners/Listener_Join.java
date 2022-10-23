@@ -1,5 +1,6 @@
 package de.mrvinrsk.challengebase.listeners;
 
+import de.mrvinrsk.challengebase.main.ChallengeBase;
 import de.mrvinrsk.challengebase.util.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,7 +42,7 @@ public class Listener_Join implements Listener {
 
         FastBoard board = boards.get(p);
         int points = 0;
-        for (Plugin plugin : eventManager.getChallengePlugins()) {
+        for (Plugin plugin : ChallengeBase.getInstance().getChallengePlugins()) {
             PointManager pm = PointManager.getInstance(p.getUniqueId(), plugin);
             points += pm.getPoints();
         }

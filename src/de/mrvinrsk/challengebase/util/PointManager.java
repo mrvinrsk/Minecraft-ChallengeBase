@@ -26,9 +26,7 @@ public class PointManager {
             pm = new PointManager(uuid, plugin);
         }
 
-        if (!pm.getUUID().equals(uuid)) {
-            pm.changeUUID(uuid);
-        }
+        pm.changeUUID(uuid);
         pm.setPlugin(plugin);
 
         return pm;
@@ -84,10 +82,14 @@ public class PointManager {
     }
 
     private void setup() {
-        if (!getFile().exists()) {
-            getFile().create();
+        try {
+            if (!getFile().exists()) {
+                getFile().create();
 
-            getFile().getConfig().set("Points", 0);
+                getFile().getConfig().set("Points", 0);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -207,11 +207,11 @@ public class Command_Event implements CommandExecutor, Listener {
                         }
                     }
                 }
-            }
-        }
 
-        if (e.getCurrentItem().isSimilar(getBack())) {
-            openMain((Player) e.getWhoClicked());
+                if (e.getCurrentItem().isSimilar(getBack())) {
+                    openMain((Player) e.getWhoClicked());
+                }
+            }
         }
     }
 

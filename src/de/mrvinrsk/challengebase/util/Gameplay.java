@@ -78,7 +78,6 @@ public class Gameplay implements Listener {
         Player p = e.getPlayer();
 
         setLogoutPosition(p.getUniqueId(), p.getLocation());
-        System.out.println("Die Logout-Position von " + p.getName() + " (" + p.getUniqueId() + ") wurde gespeichert.");
     }
 
     /**

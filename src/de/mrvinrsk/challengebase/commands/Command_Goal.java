@@ -97,11 +97,11 @@ public class Command_Goal implements CommandExecutor, Listener {
                         e.setCancelled(true);
                     }
                 }
-            }
-        }
 
-        if (e.getCurrentItem().isSimilar(getBack())) {
-            openMain((Player) e.getWhoClicked());
+                if (e.getCurrentItem().isSimilar(getBack())) {
+                    openMain((Player) e.getWhoClicked());
+                }
+            }
         }
     }
 
